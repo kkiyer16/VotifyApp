@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "673066638728",
+    "project_id": "votifyproject-cb32b",
+    "storage_bucket": "votifyproject-cb32b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673066638728:android:4c08fe39ed13f19fc56e3d",
+        "android_client_info": {
+          "package_name": "com.project.votify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673066638728-uoqe5grkuabvtvuarb4n6oibboad5924.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHsIqV3nwSeKDtKhh5zLmgIFSq49k6haU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673066638728-uoqe5grkuabvtvuarb4n6oibboad5924.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

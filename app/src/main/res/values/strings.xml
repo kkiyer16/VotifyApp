@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">VotifyProject</string>
+    <string name="create_a_new_account">Create a new Account</string>
+    <!--    <string name="signin"><u>Sign in</u>.</string>-->
+    <string name="signin">Already have an account? <u>Sign in</u>.</string>
+    <string name="signup">Don\'t have an account? <u>Sign up</u>.</string>
+
+
+    <string-array name="reg_teacher_course_year">
+        <item>First Year</item>
+        <item>Second Year</item>
+        <item>Third Year</item>
+        <item>Fourth Year</item>
+    </string-array>
+
+    <string-array name="reg_course_name">
+        <item>BE Electronics</item>
+        <item>BE Computer</item>
+        <item>BE Instrumentation</item>
+        <item>BE EXTC</item>
+        <item>BE Information Technology</item>
+        <item>ME Instrumentation</item>
+        <item>ME EXTC</item>
+        <item>ME Information Technology</item>
+        <item>MCA</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
