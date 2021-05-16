@@ -19,37 +19,33 @@ class SplashActivity : AppCompatActivity() {
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_splash)
         Handler().postDelayed({
-            val intent = Intent(applicationContext, SignInActivity::class.java)
-            startActivity(intent)
-            finish()
-        },5000)
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                val uid = FirebaseAuth.getInstance().currentUser!!.uid
+                val dbRef = FirebaseDatabase.getInstance().reference.child("Votify").child("Users").child(uid)
+                dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val userType = snapshot.child("isTeacher").value.toString()
+                        if (userType == "1") {
+                            startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
+                            finish()
+                        } else if (userType == "0") {
+                            startActivity(Intent(applicationContext, StudentHomeActivity::class.java))
+                            finish()
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
+            } else {
+                val intent = Intent(applicationContext, SignInActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }, 5000)
     }
 
     override fun onStart() {
         super.onStart()
-        if(FirebaseAuth.getInstance().currentUser != null){
-            val uid = FirebaseAuth.getInstance().currentUser!!.uid
-            val dbRef = FirebaseDatabase.getInstance().reference.child("Votify").child("Users").child(uid)
-
-            dbRef.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val userType = snapshot.child("isTeacher").value.toString()
-                    if(userType == "1"){
-                        startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
-                        finish()
-                    }
-                    else if(userType == "0"){
-                        startActivity(Intent(applicationContext, StudentHomeActivity::class.java))
-                        finish()
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    FirebaseAuth.getInstance().signOut()
-                    startActivity(Intent(applicationContext, SignInActivity::class.java))
-                    finish()
-                }
-            })
-        }
     }
 }

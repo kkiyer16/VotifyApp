@@ -23,6 +23,17 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
+            setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true)
+        }
+        if (Build.VERSION.SDK_INT >= 19) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        }
+        if (Build.VERSION.SDK_INT >= 21) {
+            setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
+            window.statusBarColor = Color.TRANSPARENT
+        }
+
         val chkbox_teacher = findViewById<CheckBox>(R.id.register_checkbox_teacher)
         val chkbox_student = findViewById<CheckBox>(R.id.register_checkbox_student)
         val nav_to_signin_page = findViewById<TextView>(R.id.navigate_to_sigin_page)
@@ -35,7 +46,7 @@ class RegisterActivity : AppCompatActivity() {
         actv_course_name.setOnItemClickListener { adapterView, view, i, l ->
             if (!actv_course_name.isSelected) {
                 Toast.makeText(applicationContext, "Please Select Course Name", Toast.LENGTH_SHORT)
-                    .show()
+                        .show()
             }
             reg_course_name = actv_course_name.text.toString()
         }
@@ -127,4 +138,18 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun setWindowFlag(bits: Int, on: Boolean) {
+        val win = window
+        val winParams = win.attributes
+        if (on) {
+            winParams.flags = winParams.flags or bits
+        } else {
+            winParams.flags = winParams.flags and bits.inv()
+        }
+        win.attributes = winParams
+    }
 }
+
+
+

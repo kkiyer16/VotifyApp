@@ -12,7 +12,7 @@
         android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
         android:layout_height="240dp"
-        android:src="@drawable/ic_launcher_background"
+        android:src="@drawable/votify_logo_new"
         />
 
 </RelativeLayout>

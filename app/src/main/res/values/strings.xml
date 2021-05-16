@@ -4,6 +4,9 @@
     <!--    <string name="signin"><u>Sign in</u>.</string>-->
     <string name="signin">Already have an account? <u>Sign in</u>.</string>
     <string name="signup">Don\'t have an account? <u>Sign up</u>.</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="blank">%d</string>
 
 
     <string-array name="reg_teacher_course_year">
@@ -19,11 +22,29 @@
         <item>BE Instrumentation</item>
         <item>BE EXTC</item>
         <item>BE Information Technology</item>
+        <item>BCA</item>
+        <item>BSc</item>
+        <item>BSc IT</item>
+        <item>BSc CS</item>
+        <item>BCom</item>
         <item>ME Instrumentation</item>
         <item>ME EXTC</item>
         <item>ME Information Technology</item>
         <item>MCA</item>
+        <item>MSc</item>
+        <item>MSc IT</item>
+        <item>MSc CS</item>
+        <item>MCom</item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_add_post">AddPostActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

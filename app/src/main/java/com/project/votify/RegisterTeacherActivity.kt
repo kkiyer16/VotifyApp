@@ -1,36 +1,57 @@
 package com.project.votify
 
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 
 class RegisterTeacherActivity : AppCompatActivity() {
 
     lateinit var course_year: String
     private val fStore = FirebaseFirestore.getInstance()
+
     //lateinit var actv_course_year : AutoCompleteTextView
     lateinit var dbRef: DatabaseReference
     private val fAuth = FirebaseAuth.getInstance()
     lateinit var listener: ValueEventListener
     lateinit var adapter: ArrayAdapter<String>
     lateinit var spinnerDataList: ArrayList<String>
-
+    lateinit var spinnerIdList: ArrayList<String>
+    var selectedId: String = "";
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_teacher)
 
+        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
+            setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true)
+        }
+        if (Build.VERSION.SDK_INT >= 19) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        }
+        if (Build.VERSION.SDK_INT >= 21) {
+            setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
+            window.statusBarColor = Color.TRANSPARENT
+        }
+
         //add and Display College Spinner
         dbRef = FirebaseDatabase.getInstance().getReference("Votify/CollegeName")
         spinnerDataList = ArrayList()
+        spinnerIdList = ArrayList()
         adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, spinnerDataList)
         val disp_college_spinner = findViewById<AutoCompleteTextView>(R.id.select_college_spinner)
+        disp_college_spinner.setOnItemClickListener { parent, view, position, id ->
+            selectedId = spinnerIdList[position]
+            Toast.makeText(applicationContext, selectedId, Toast.LENGTH_SHORT).show()
+        }
         disp_college_spinner.setAdapter(adapter)
         retreiveClgNameFromDBIntoList()
 
@@ -83,73 +104,44 @@ class RegisterTeacherActivity : AppCompatActivity() {
 
         if (teacher_section.isEmpty() || reg_teacher_id.isEmpty() || college_name.isEmpty()) {
             Toast.makeText(applicationContext, "Enter Required Credentials", Toast.LENGTH_LONG).show()
-        }
-        else if (college_name == "") {
+        } else if (college_name == "" && selectedId == "") {
             clgName.error = "Select College Name"
-        }
-        else if (TextUtils.isEmpty(reg_teacher_id)) {
+        } else if (TextUtils.isEmpty(reg_teacher_id)) {
             teacher_id.error = "Enter ID."
-        }
-        else if (TextUtils.isEmpty(teacher_section)) {
+        } else if (TextUtils.isEmpty(teacher_section)) {
             section.error = "Enter Section."
-        }
-        else {
+        } else {
             fAuth.createUserWithEmailAndPassword(reg_email_id, reg_password).addOnCompleteListener {
                 if (it.isSuccessful) {
                     val teacherNew = HashMap<String, Any>()
-                    teacherNew["TeacherName"] = user_name
-                    teacherNew["TeacherMobileNumber"] = mob_no
-                    teacherNew["TeachingCourseName"] = reg_course_name
-                    teacherNew["TeacherEmailID"] = reg_email_id
-                    teacherNew["TeachingCourseYear"] = year_of_course
-                    teacherNew["TeacherCollegeName"] = college_name
-                    teacherNew["TeachingSection"] = teacher_section
-                    teacherNew["TeacherID"] = reg_teacher_id
+                    teacherNew["name"] = user_name
+                    teacherNew["mobilenumber"] = mob_no
+                    teacherNew["coursename"] = reg_course_name
+                    teacherNew["emailid"] = reg_email_id
+                    teacherNew["courseyear"] = year_of_course
+                    teacherNew["collegename"] = college_name
+                    teacherNew["section"] = teacher_section
+                    teacherNew["collegeid"] = reg_teacher_id
                     teacherNew["isTeacher"] = isTeacher
-                    teacherNew["Teacheruid"] = fAuth.uid.toString()
+                    teacherNew["collegeuid"]=selectedId
+                    teacherNew["uid"] = fAuth.uid.toString()
 
                     //FireBase
                     val fBase = FirebaseDatabase.getInstance().reference
                     fBase.child("Votify").child("Users").child(fAuth.uid.toString())
-                        .setValue(teacherNew)
-                        .addOnSuccessListener {
-                            Toast.makeText(applicationContext, "Registered Successfully!!", Toast.LENGTH_LONG).show()
-                            startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(applicationContext, "Failed to Register!!", Toast.LENGTH_LONG).show()
-                        }
-
-
-//                //FireStore
-//                fStore.collection("Votify").document("Teacher")
-//                    .collection("$year_of_course $reg_course_name $teacher_section")
-//                    .document(fAuth.uid.toString())
-//                    .set(teacherNew, SetOptions.merge())
-//                    .addOnSuccessListener {
-//                        Toast.makeText(
-//                            applicationContext,
-//                            "Registered Successfully!!",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                        val intent = Intent(applicationContext, TeacherHomeActivity::class.java)
-//                        intent.putExtra("reg_course_name", reg_course_name)
-//                        intent.putExtra("year_of_course", year_of_course)
-//                        intent.putExtra("teacher_section", teacher_section)
-//                        startActivity(intent)
-//                    }
-//                    .addOnFailureListener{
-//                        Toast.makeText(
-//                            applicationContext,
-//                            "Failed to Register!!",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    }
+                            .setValue(teacherNew)
+                            .addOnSuccessListener {
+                                Toast.makeText(applicationContext, "Registered Successfully!!", Toast.LENGTH_LONG).show()
+                                startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(applicationContext, "Failed to Register!!", Toast.LENGTH_LONG).show()
+                            }
                 } else {
                     Toast.makeText(
-                        applicationContext,
-                        "Failed to Register into Database!!",
-                        Toast.LENGTH_LONG
+                            applicationContext,
+                            "Failed to Register into Database!!",
+                            Toast.LENGTH_LONG
                     ).show()
                 }
             }
@@ -162,6 +154,7 @@ class RegisterTeacherActivity : AppCompatActivity() {
                 spinnerDataList.clear()
                 for (item in snapshot.children) {
                     spinnerDataList.add(item.value.toString())
+                    spinnerIdList.add(item.key.toString())
                 }
                 adapter.notifyDataSetChanged()
             }
@@ -171,4 +164,14 @@ class RegisterTeacherActivity : AppCompatActivity() {
         })
     }
 
+    private fun setWindowFlag(bits: Int, on: Boolean) {
+        val win = window
+        val winParams = win.attributes
+        if (on) {
+            winParams.flags = winParams.flags or bits
+        } else {
+            winParams.flags = winParams.flags and bits.inv()
+        }
+        win.attributes = winParams
+    }
 }

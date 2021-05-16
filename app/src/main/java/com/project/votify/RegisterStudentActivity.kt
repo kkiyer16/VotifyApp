@@ -1,34 +1,54 @@
 package com.project.votify
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
+import android.view.WindowManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 
 class RegisterStudentActivity : AppCompatActivity() {
 
-    lateinit var course_year : String
+    lateinit var course_year: String
     private val fStore = FirebaseFirestore.getInstance()
     private val fAuth = FirebaseAuth.getInstance()
     lateinit var dbRef: DatabaseReference
     lateinit var listener: ValueEventListener
     lateinit var adapter: ArrayAdapter<String>
     lateinit var spinnerDataList: ArrayList<String>
-
+    lateinit var spinnerIdList: ArrayList<String>
+    var selectedId: String = "";
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_student)
 
+        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
+            setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true)
+        }
+        if (Build.VERSION.SDK_INT >= 19) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        }
+        if (Build.VERSION.SDK_INT >= 21) {
+            setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
+            window.statusBarColor = Color.TRANSPARENT
+        }
+
         dbRef = FirebaseDatabase.getInstance().getReference("Votify/CollegeName")
         spinnerDataList = ArrayList()
+        spinnerIdList = ArrayList()
         adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, spinnerDataList)
         val disp_college_spinner = findViewById<AutoCompleteTextView>(R.id.actv_select_college_student)
+        disp_college_spinner.setOnItemClickListener { parent, view, position, id ->
+            selectedId = spinnerIdList[position]
+            Toast.makeText(applicationContext, selectedId, Toast.LENGTH_SHORT).show()
+        }
         disp_college_spinner.setAdapter(adapter)
         retreiveClgNameFromDBIntoList()
 
@@ -78,56 +98,40 @@ class RegisterStudentActivity : AppCompatActivity() {
         else if(TextUtils.isEmpty(student_rno)){
             student_roll_no.error = "Enter Roll No."
         }
-        else if(TextUtils.isEmpty(stud_section)){
+        else if (TextUtils.isEmpty(stud_section)) {
             student_section.error = "Enter Section."
-        }
-        else if(college_name == ""){
+        } else if (college_name == "" && selectedId.isNotEmpty()) {
             clgNameStud.error = "Select College!"
-        }
-        else{
+        } else {
             fAuth.createUserWithEmailAndPassword(student_reg_email_id, student_reg_password).addOnCompleteListener {
-                if(it.isSuccessful){
+                if (it.isSuccessful) {
                     val studentNew = HashMap<String, Any>()
-                    studentNew["StudentName"] = student_user_name
-                    studentNew["StudentMobileNumber"] = student_mob_no
-                    studentNew["StudentCourseName"] = student_reg_course_name
-                    studentNew["StudentEmailID"] = student_reg_email_id
-                    studentNew["StudentCourseYear"] = student_year_of_course
-                    studentNew["StudentSection"] = stud_section
-                    studentNew["StudentCollegeName"] = college_name
-                    studentNew["StudentRollNumber"] = student_rno
+                    studentNew["name"] = student_user_name
+                    studentNew["mobilenumber"] = student_mob_no
+                    studentNew["coursename"] = student_reg_course_name
+                    studentNew["emailid"] = student_reg_email_id
+                    studentNew["courseyear"] = student_year_of_course
+                    studentNew["section"] = stud_section
+                    studentNew["collegename"] = college_name
+                    studentNew["collegeid"] = student_rno
                     studentNew["isTeacher"] = isTeacher
-                    studentNew["Studentuid"] = fAuth.uid.toString()
+                    studentNew["collegeuid"] = selectedId
+                    studentNew["uid"] = fAuth.uid.toString()
 
                     //FireBase
                     val fBase = FirebaseDatabase.getInstance().reference
                     fBase.child("Votify").child("Users").child(fAuth.uid.toString())
-                        .setValue(studentNew)
-                        .addOnSuccessListener {
-                            Toast.makeText(applicationContext, "Registered Successfully!!", Toast.LENGTH_LONG).show()
-                            startActivity(Intent(applicationContext, StudentHomeActivity::class.java))
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(applicationContext, "Failed to Register!!", Toast.LENGTH_LONG).show()
-                        }
+                            .setValue(studentNew)
+                            .addOnSuccessListener {
+                                Toast.makeText(applicationContext, "Registered Successfully!!", Toast.LENGTH_LONG).show()
+                                startActivity(Intent(applicationContext, StudentHomeActivity::class.java))
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(applicationContext, "Failed to Register!!", Toast.LENGTH_LONG).show()
+                            }
 
 
-                    //Firestore
-    //                fStore.collection("Votify").document("Student")
-    //                    .collection("$student_year_of_course $student_reg_course_name $stud_section")
-    //                    .document(fAuth.uid.toString())
-    //                    .set(studentNew, SetOptions.merge())
-    //                    .addOnSuccessListener {
-    //                        Toast.makeText(applicationContext, "Registered Successfully!!", Toast.LENGTH_LONG).show()
-    //                        val intent = Intent(applicationContext, TeacherHomeActivity::class.java)
-    //                        intent.putExtra("reg_course_name", student_reg_course_name)
-    //                        intent.putExtra("student_year_of_course", student_year_of_course)
-    //                        intent.putExtra("student_section", stud_section)
-    //                        startActivity(intent)
-    //                    }
-    //                    .addOnFailureListener{
-    //                        Toast.makeText(applicationContext, "Failed to Register!!", Toast.LENGTH_LONG).show()
-    //                    }
+
                 }
                 else{
                     Toast.makeText(applicationContext, "Failed to Register into Database!!", Toast.LENGTH_LONG).show()
@@ -142,6 +146,8 @@ class RegisterStudentActivity : AppCompatActivity() {
                 spinnerDataList.clear()
                 for (item in snapshot.children) {
                     spinnerDataList.add(item.value.toString())
+                    spinnerIdList.add(item.key.toString())
+
                 }
                 adapter.notifyDataSetChanged()
             }
@@ -149,5 +155,16 @@ class RegisterStudentActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
+    }
+
+    private fun setWindowFlag(bits: Int, on: Boolean) {
+        val win = window
+        val winParams = win.attributes
+        if (on) {
+            winParams.flags = winParams.flags or bits
+        } else {
+            winParams.flags = winParams.flags and bits.inv()
+        }
+        win.attributes = winParams
     }
 }
