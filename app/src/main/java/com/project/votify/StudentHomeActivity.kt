@@ -16,8 +16,8 @@ import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.mikhaellopez.circularimageview.CircularImageView
-import com.project.votify.Adapter.PageAdapter
-import com.project.votify.Adapter.ZoomOutPageTransformer
+import com.project.votify.adapter.PageAdapter
+import com.project.votify.adapter.ZoomOutPageTransformer
 import com.project.votify.databinding.ActivityStudentHomeBinding
 
 class StudentHomeActivity : AppCompatActivity() {

@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.VotifyProject" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.VotifyProject.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">#345AD6</item>
         <item name="colorPrimaryVariant">#00B1FF</item>
@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
     </style>
 
     <style name="ShapeAppearance.votify.Button.Circle" parent="">
@@ -25,7 +27,7 @@
         <item name="android:textColorSecondary">@color/white</item>
     </style>
 
-    <style name="Theme.VotifyProject.NoActionBar">
+    <style name="Theme.VotifyProject.NoActionBar" parent="Theme.MaterialComponents.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -45,5 +47,29 @@
     <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
     </style>
+    <style name="card.shape.round" parent="Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/cardshape</item>
+    </style>
 
+    <style name="Button.shape.bottom" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="shapeAppearanceOverlay">@style/MyShapeAppearanceBottom</item>
+    </style>
+
+    <style name="cardshape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerFamilyTopRight">cut</item>
+        <item name="cornerFamilyBottomRight">cut</item>
+        <item name="cornerSizeTopLeft">32dp</item>
+        <item name="cornerSizeBottomLeft">32dp</item>
+    </style>
+
+    <style name="MyShapeAppearanceBottom">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">32dp</item>
+        <item name="cornerSizeBottomRight">32dp</item>
+        <item name="cornerSizeBottomLeft">32dp</item>
+        <item name="cornerSizeTopLeft">32dp</item>
+        <!--        <item name="cornerFamilyTopLeft">rounded</item>-->
+        <!--        <item name="cornerFamilyBottomLeft">rounded</item>-->
+    </style>
 </resources>

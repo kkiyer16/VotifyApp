@@ -30,9 +30,14 @@ class TeacherHomeActivity : AppCompatActivity() {
             toolbar.overflowIcon!!.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
         }
 
-        binding.createPolls.setOnClickListener {  }
+        binding.addCandidates.setOnClickListener {
+            startActivity(Intent(applicationContext, AddCandidateActivity::class.java))
 
-        binding.removeCandidate.setOnClickListener {  }
+        }
+        binding.removeCandidate.setOnClickListener {
+            startActivity(Intent(applicationContext, RemoveCandidateActivity::class.java))
+
+        }
 
         binding.createPolls.setOnClickListener {
             startActivity(Intent(applicationContext, TeacherCreatePollActivity::class.java))
