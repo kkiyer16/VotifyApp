@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F8F8"
+    tools:context=".ProfileFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="265dp"
+        android:background="@color/transparent"
+        app:elevation="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/gradient_bg" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:minHeight="50dp"
+                app:elevation="0dp"
+                app:title="" />
+
+            <TextView
+                android:id="@+id/tv_pro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:text="Profile"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
+
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/profile_pic_of_student"
+                android:layout_width="135dp"
+                android:layout_height="135dp"
+                android:layout_below="@id/tv_pro"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/unisex_avatar"
+                app:civ_border_color="@color/transparent"
+                app:civ_border_color_end="@color/black"
+                app:civ_border_color_start="@color/black"
+                app:civ_border_width="2dp" />
+
+            <TextView
+                android:id="@+id/name_of_student"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profile_pic_of_student"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="-5dp"
+                android:text="name"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="-30dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/edit_profile_student"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/white"
+            android:elevation="20dp"
+            android:text="Edit Profile"
+            android:textColor="#345AD6"
+            app:cornerRadius="50dp" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_below="@id/rl1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <com.skyhope.expandcollapsecardview.ExpandCollapseCard
+                android:id="@+id/personal_information_student"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp"
+                app:cardUseCompatPadding="true"
+                app:collapse_icon="@drawable/arrow_down"
+                app:expand_icon="@drawable/ic_arrow_up"
+                app:item_inner_view="@layout/teacher_per_info_layout"
+                app:title="Personal Information"
+                app:title_color="#000000"
+                app:title_size="16sp" />
+
+            <com.skyhope.expandcollapsecardview.ExpandCollapseCard
+                android:id="@+id/college_information_student"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/personal_information_student"
+                android:layout_marginTop="-15dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp"
+                app:cardUseCompatPadding="true"
+                app:collapse_icon="@drawable/arrow_down"
+                app:expand_icon="@drawable/ic_arrow_up"
+                app:item_inner_view="@layout/teacher_clg_info_layout"
+                app:title="College Information"
+                app:title_color="#000000"
+                app:title_size="16sp" />
+
+            <com.skyhope.expandcollapsecardview.ExpandCollapseCard
+                android:id="@+id/change_password_student"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/college_information_student"
+                android:layout_marginTop="-15dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp"
+                app:cardUseCompatPadding="true"
+                app:collapse_icon="@drawable/arrow_down"
+                app:expand_icon="@drawable/ic_arrow_up"
+                app:item_inner_view="@layout/teacher_change_password_layout"
+                app:title="Change Password"
+                app:title_color="#000000"
+                app:title_size="16sp" />
+
+            <com.skyhope.expandcollapsecardview.ExpandCollapseCard
+                android:id="@+id/change_email_id_student"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/change_password_student"
+                android:layout_marginTop="-15dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp"
+                app:cardUseCompatPadding="true"
+                app:collapse_icon="@drawable/arrow_down"
+                app:expand_icon="@drawable/ic_arrow_up"
+                app:item_inner_view="@layout/teacher_change_emailid_layout"
+                app:title="Change Email ID"
+                app:title_color="#000000"
+                app:title_size="16sp" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

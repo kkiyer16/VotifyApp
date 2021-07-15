@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/drawer_home"
+        android:icon="@drawable/home_selector"
+        android:iconTint="@color/main_theme_2"
+        android:title="Home" />
+    <item
+        android:id="@+id/drawer_polls"
+        android:icon="@drawable/polls_selector"
+        android:iconTint="@color/main_theme_2"
+        android:title="Polls" />
+    <item
+        android:id="@+id/drawer_results"
+        android:icon="@drawable/ic_polling_results"
+        android:iconTint="@color/main_theme_2"
+        android:title="Results" />
+
+    <item
+        android:id="@+id/drawer_add_post"
+        android:icon="@drawable/ic_add_post"
+        android:iconTint="@color/main_theme_2"
+        android:title="Add Post" />
+    <item
+        android:id="@+id/drawer_profile"
+        android:icon="@drawable/profile_selector"
+        android:iconTint="@color/main_theme_2"
+        android:title="Profile" />
+    <item
+        android:id="@+id/drawer_logout"
+        android:icon="@drawable/logout"
+        android:iconTint="@color/main_theme_2"
+        android:title="Logout" />
+</menu>
