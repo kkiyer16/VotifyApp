@@ -24,7 +24,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class AddCandidateActivity : AppCompatActivity() {
-    var testvar =""
     lateinit var binding: ActivityAddCandidateBinding
     lateinit var studentList: ArrayList<User>
     lateinit var adapter: StudentAdapter
