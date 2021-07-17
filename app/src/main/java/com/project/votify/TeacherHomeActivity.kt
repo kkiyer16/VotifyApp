@@ -55,37 +55,4 @@ class TeacherHomeActivity : AppCompatActivity() {
             startActivity(Intent(applicationContext, TeacherProfileActivity::class.java))
         }
     }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.side_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.sign_out_teacher->{
-                AlertDialog.Builder(this).apply {
-                    setTitle("Are you sure?")
-                    setPositiveButton("OK"){ _, _ ->
-                        FirebaseAuth.getInstance().signOut()
-                        Toast.makeText(applicationContext, "Logged Out!", Toast.LENGTH_LONG).show()
-                        startActivity(Intent(applicationContext, SignInActivity::class.java))
-                        finish()
-                    }
-                    setNegativeButton("Cancel"){ _, _ ->
-                    }
-                }.create().show()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if(FirebaseAuth.getInstance().currentUser == null){
-            startActivity(Intent(this, SignInActivity::class.java))
-            finish()
-        }
-    }
 }

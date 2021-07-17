@@ -120,8 +120,12 @@ class SignInActivity : AppCompatActivity() {
         dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userType = snapshot.child("isTeacher").value.toString()
+//                if(userType == "1"){
+//                    startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
+//                    finish()
+//                }
                 if(userType == "1"){
-                    startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
+                    startActivity(Intent(applicationContext, TeacherHomeMainActivity::class.java))
                     finish()
                 }
                 else if(userType == "0"){

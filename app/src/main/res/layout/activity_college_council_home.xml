@@ -7,7 +7,7 @@
     android:background="@drawable/home_bg_teacher"
     android:orientation="vertical"
     android:padding="5dp"
-    tools:context=".TeacherHomeActivity">
+    tools:context=".CollegeCouncilHomeActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/homebar"
@@ -51,7 +51,7 @@
         android:rowCount="3">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/add_candidates"
+            android:id="@+id/college_council_add_candidates"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
@@ -85,7 +85,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/remove_candidate"
+            android:id="@+id/college_council_remove_candidate"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
@@ -120,7 +120,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/create_polls"
+            android:id="@+id/college_council_create_polls"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
@@ -155,7 +155,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/add_post"
+            android:id="@+id/college_council_add_post"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
@@ -190,7 +190,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/display_results"
+            android:id="@+id/college_council_display_results"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
@@ -225,7 +225,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/teacher_profile"
+            android:id="@+id/college_council_teacher_profile"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"

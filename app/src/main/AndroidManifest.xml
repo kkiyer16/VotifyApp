@@ -17,12 +17,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VotifyProject.Light"
         tools:replace="android:icon">
-        <activity android:name=".RemoveCandidateActivity"
-            android:theme="@style/Theme.VotifyProject.Light"/>
+        <activity android:name=".CollegeCouncilAddCandidateActivity"></activity>
+        <activity android:name=".CollegeCouncilHomeActivity" />
+        <activity android:name=".TeacherHomeMainActivity" />
+        <activity
+            android:name=".RemoveCandidateActivity"
+            android:theme="@style/Theme.VotifyProject.Light" />
         <activity
             android:name=".AddCandidateActivity"
             android:theme="@style/Theme.VotifyProject.Light" />
-        <activity android:name=".WinnersActivity"/>
+        <activity android:name=".WinnersActivity" />
         <activity android:name=".StudentViewResultActivity" />
         <activity android:name=".TeacherDisplayResultActivity" />
         <activity android:name=".TeacherAddPostActivity" />

@@ -132,7 +132,7 @@ class RegisterTeacherActivity : AppCompatActivity() {
                             .setValue(teacherNew)
                             .addOnSuccessListener {
                                 Toast.makeText(applicationContext, "Registered Successfully!!", Toast.LENGTH_LONG).show()
-                                startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
+                                startActivity(Intent(applicationContext, TeacherHomeMainActivity::class.java))
                             }
                             .addOnFailureListener {
                                 Toast.makeText(applicationContext, "Failed to Register!!", Toast.LENGTH_LONG).show()

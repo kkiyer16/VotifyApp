@@ -1,5 +1,7 @@
 package com.project.votify
 
+import android.R
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
@@ -7,7 +9,6 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.RelativeLayout
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -15,17 +16,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.project.votify.adapter.SelectedCandidateAdapter
 import com.project.votify.adapter.StudentAdapter
-import com.project.votify.databinding.ActivityAddCandidateBinding
+import com.project.votify.databinding.ActivityCollegeCouncilAddCandidateBinding
 import com.project.votify.databinding.AddCandidateDialogBinding
 import com.project.votify.models.ChangeValue
 import com.project.votify.models.User
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
-class AddCandidateActivity : AppCompatActivity() {
+class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityAddCandidateBinding
+    lateinit var binding: ActivityCollegeCouncilAddCandidateBinding
     lateinit var studentList: ArrayList<User>
     lateinit var adapter: StudentAdapter
     lateinit var selectedCandidateAdapter: SelectedCandidateAdapter
@@ -36,12 +38,16 @@ class AddCandidateActivity : AppCompatActivity() {
     private var teacherCollegeUid: String = ""
     lateinit var sectionList: ArrayList<String>
     lateinit var classList: ArrayList<String>
+    lateinit var list: ArrayList<String>
+    lateinit var winnersArrList : ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddCandidateBinding.inflate(layoutInflater)
+        binding = ActivityCollegeCouncilAddCandidateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        winnersArrList = ArrayList()
+        list = ArrayList()
         setSupportActionBar(binding.toolbar)
         bottomSheetBinder = binding.bottomDialog
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetBinder!!.root)
@@ -63,37 +69,57 @@ class AddCandidateActivity : AppCompatActivity() {
         binding.sectionFilter.setAdapter(
             ArrayAdapter(
                 this,
-                android.R.layout.simple_spinner_dropdown_item,
+                R.layout.simple_spinner_dropdown_item,
                 sectionList
             )
         )
         binding.classFilter.setAdapter(
             ArrayAdapter(
                 this,
-                android.R.layout.simple_spinner_dropdown_item,
+                R.layout.simple_spinner_dropdown_item,
                 classList
             )
         )
         binding.candidateRecycler.layoutManager = LinearLayoutManager(applicationContext)
         binding.candidateRecycler.adapter = adapter
         reference = FirebaseDatabase.getInstance().reference
+
         reference.child("Votify").child("Users").child(FirebaseAuth.getInstance().currentUser!!.uid)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists() && snapshot.hasChildren()) {
                         val collegeUid = snapshot.child("collegeuid").value.toString()
-                        val section = snapshot.child("section").value.toString()
-                        val year = snapshot.child("courseyear").value.toString()
                         val course = snapshot.child("coursename").value.toString()
                         teacherCollegeUid = collegeUid
-                        loadStudentData(collegeUid, section, year, course)
+                        reference.child("Votify").child("Institution").child(collegeUid).child("PositionData")
+                            .addValueEventListener(object: ValueEventListener{
+                                override fun onDataChange(snap: DataSnapshot) {
+                                    for(dataSnapshot in snap.children){
+                                        println("PositionDataUid: ${dataSnapshot.key.toString()}")
+                                        val positionDataUid = dataSnapshot.key.toString()
+                                        reference.child("Votify").child("Institution").child(collegeUid)
+                                            .child("PositionData").child(positionDataUid).child("representatives")
+                                            .addValueEventListener(object : ValueEventListener{
+                                                override fun onDataChange(sn: DataSnapshot) {
+                                                    sn.children.forEach { winUid->
+                                                        println("WinnersUID: ${winUid.key.toString()}")
+                                                        loadStudentData(winUid.key.toString())
+                                                    }
+                                                }
+                                                override fun onCancelled(error: DatabaseError) {
+                                                }
+                                            })
+                                    }
+                                }
+                                override fun onCancelled(err: DatabaseError) {
+                                }
+                            })
                     }
                 }
-
                 override fun onCancelled(error: DatabaseError) {
                 }
-
             })
+
         binding.searchStudent.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (TextUtils.isEmpty(query)) {
@@ -117,10 +143,10 @@ class AddCandidateActivity : AppCompatActivity() {
             adapter.filterBySection(sectionList[position])
         }
         binding.classFilter.setOnItemClickListener { _, _, position, _ ->
-
             adapter.filterByClass(classList[position])
         }
     }
+
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
@@ -194,43 +220,30 @@ class AddCandidateActivity : AppCompatActivity() {
         if (teacherCollegeUid != "") {
             val dataUid = UUID.randomUUID().toString()
             reference.child("Votify").child("Institution").child(teacherCollegeUid)
-                .child("CandidateData").child(dataUid).setValue(data).addOnSuccessListener {
+                .child("CollegeCouncil").child("CandidateData").child(dataUid)
+                .setValue(data).addOnSuccessListener {
                     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-                    Toast.makeText(
-                        applicationContext,
-                        "Candidates are added successfully!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(applicationContext, "Candidates are added successfully!!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
                     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-                    Toast.makeText(
-                        applicationContext,
-                        "Something went wrong!!",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    Toast.makeText(applicationContext, "Something went wrong!!", Toast.LENGTH_SHORT).show()
                 }
 
         }
     }
 
-    private fun loadStudentData(collegeUid: String, section: String, year: String, course: String) {
-        reference.child("Votify").child("Users")
-            .orderByChild("collegeuid")
-            .equalTo(collegeUid)
-            .addValueEventListener(object : ValueEventListener {
+    private fun loadStudentData(winnersUid: String) {
+        reference.child("Votify").child("Users").orderByChild("uid").equalTo(winnersUid)
+            .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists() && snapshot.hasChildren()) {
-                        studentList.clear()
+//                        studentList.clear()
                         for (childSnapshot: DataSnapshot in snapshot.children) {
                             if (childSnapshot.key != FirebaseAuth.getInstance().currentUser!!.uid) {
-//                                val childSection = childSnapshot.child("section").value.toString()
-                                val childCourseName =
-                                    childSnapshot.child("coursename").value.toString()
-//                                val childCourseYear = childSnapshot.child("courseyear").value.toString()
+                                val uid = childSnapshot.child("uid").value.toString()
                                 val isTeacher = childSnapshot.child("isTeacher").value.toString()
-                                if (childCourseName == course && isTeacher == "0") {
+                                if (uid == winnersUid && isTeacher == "0") {
                                     val user = User(
                                         childSnapshot.key.toString(),
                                         childSnapshot.child("name").value.toString(),
@@ -261,7 +274,7 @@ class AddCandidateActivity : AppCompatActivity() {
 
                 override fun onCancelled(error: DatabaseError) {
                 }
+
             })
     }
-
 }

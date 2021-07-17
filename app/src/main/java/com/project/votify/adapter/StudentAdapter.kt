@@ -14,16 +14,14 @@ import com.project.votify.models.User
 import com.project.votify.utils.StudentHolder
 import java.util.*
 
-class StudentAdapter(
-    var studentList: ArrayList<User>,
-    var context: Context,
-    var changeListner: ChangeValue
-) :
+class StudentAdapter(var studentList: ArrayList<User>, var context: Context, var changeListner: ChangeValue) :
     RecyclerView.Adapter<StudentHolder>() {
+
     var itemSelected: Int = 0
     var commonCourseYear = ""
     var commonSection = ""
     private var originalList: ArrayList<User> = studentList
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StudentHolder {
         val binding =
             AddCandidateStudentRowBinding.inflate(LayoutInflater.from(context), parent, false)
@@ -36,8 +34,7 @@ class StudentAdapter(
         holder.binding.studentClass.text = "Class: ${user.courseYear}"
         holder.binding.studentSection.text = "Section: ${user.section}"
         if (user.profileimageurl != "null") {
-            Glide.with(holder.binding.root).load(user.profileimageurl)
-                .into(holder.binding.userImage)
+            Glide.with(holder.binding.root).load(user.profileimageurl).into(holder.binding.userImage)
         }
         holder.binding.rowLayout.setOnLongClickListener {
             if (!user.isSelected) {
@@ -53,11 +50,7 @@ class StudentAdapter(
                     holder.binding.rowLayout.alpha = 0.7f
                     itemSelected += 1
                 } else {
-                    Toast.makeText(
-                        context,
-                        "You can only select common class and section candidates",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, "You can only select common class and section candidates", Toast.LENGTH_SHORT).show()
                 }
 
             } else {
