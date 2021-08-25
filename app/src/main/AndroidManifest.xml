@@ -17,7 +17,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VotifyProject.Light"
         tools:replace="android:icon">
-        <activity android:name=".CollegeCouncilAddCandidateActivity"></activity>
+        <activity android:name=".ClgCouncilWinnersActivity"></activity>
+        <activity android:name=".ClgCouncilDisplayResultActivity" />
+        <activity android:name=".CollegeCouncilViewResultActivity" />
+        <activity android:name=".StudentClgCouncilViewResultActivity" />
+        <activity android:name=".ViewResultActivity" />
+        <activity android:name=".CollegeCouncilStudentVotingActivity" />
+        <activity android:name=".ClgCouncilPollsActicity" />
+        <activity android:name=".ClassCouncilPollsActicity" />
+        <activity android:name=".ClgCouncilCreatePollInsideActivity" />
+        <activity android:name=".CollegeCouncilCreatePollsActivity" />
+        <activity android:name=".CollegeCouncilRemoveCandidateActivity" />
+        <activity android:name=".CollegeCouncilAddCandidateActivity" />
         <activity android:name=".CollegeCouncilHomeActivity" />
         <activity android:name=".TeacherHomeMainActivity" />
         <activity

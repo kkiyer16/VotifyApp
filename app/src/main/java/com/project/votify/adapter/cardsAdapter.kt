@@ -34,6 +34,7 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
     var cast_vote_card_view = 2
     var candidate_display_card_view = 3
     var winner_display_card = 4
+    var clg_council_position_card_view = 5
     private val currentUser = FirebaseAuth.getInstance().currentUser!!.uid
     private val fBase = FirebaseDatabase.getInstance().reference
     var clickedPosition: Int? = null
@@ -57,20 +58,19 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
 
         when (viewType) {
             position_card_view -> {
-                view = LayoutInflater.from(context)
-                    .inflate(R.layout.create_polls_recycler_view_layout, parent, false)
+                view = LayoutInflater.from(context).inflate(R.layout.create_polls_recycler_view_layout, parent, false)
             }
             cast_vote_card_view -> {
-                view = LayoutInflater.from(context)
-                    .inflate(R.layout.student_cast_vote_card_layout, parent, false)
+                view = LayoutInflater.from(context).inflate(R.layout.student_cast_vote_card_layout, parent, false)
             }
             candidate_display_card_view -> {
-                view = LayoutInflater.from(context)
-                    .inflate(R.layout.add_candidate_student_row, parent, false)
+                view = LayoutInflater.from(context).inflate(R.layout.add_candidate_student_row, parent, false)
             }
             winner_display_card -> {
-                view = LayoutInflater.from(context)
-                    .inflate(R.layout.winner_display_layout, parent, false)
+                view = LayoutInflater.from(context).inflate(R.layout.winner_display_layout, parent, false)
+            }
+            clg_council_position_card_view ->{
+                view = LayoutInflater.from(context).inflate(R.layout.clg_council_create_polls_rv_layout, parent, false)
             }
         }
         return cardViewHolder(view!!)
@@ -89,6 +89,9 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
             }
             winner_display_card -> {
                 return winner_display_card
+            }
+            clg_council_position_card_view -> {
+                return clg_council_position_card_view
             }
             else -> {
                 return 0
@@ -109,25 +112,17 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
         when (type) {
             modelnames.pollpos -> {
                 val positionData = list[position] as PositionData
-                val createPollPosition =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_position)
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.create_poll_position)
                 val createPollClass = holder.itemview.findViewById<TextView>(R.id.create_poll_class)
-                val createPollSection =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_section)
+                val createPollSection = holder.itemview.findViewById<TextView>(R.id.create_poll_section)
                 val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.view_more)
-                val positionPollCard =
-                    holder.itemview.findViewById<MaterialCardView>(R.id.position_poll_card)
-                createPollClass.text =
-                    "Class: ${positionData.courseName} ${positionData.courseYear}"
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.position_poll_card)
+                createPollClass.text = "Class: ${positionData.courseName} ${positionData.courseYear}"
                 createPollPosition.text = "Position: ${positionData.position}"
                 createPollSection.text = "Section: ${positionData.section}"
 
                 viewMore.setOnClickListener {
-                    context.startActivity(
-                        Intent(
-                            context,
-                            CreatePollInsideActivity::class.java
-                        ).apply {
+                    context.startActivity(Intent(context, CreatePollInsideActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             putExtra("candidate_uid_ref", positionData.candidateUidRef)
                             putExtra("position", positionData.position)
@@ -136,6 +131,22 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
                             putExtra("course_year", positionData.courseYear)
                         })
                 }
+
+//                fBase.child("Votify").child("Institution").child(positionData.collegeUid).child("Polls")
+//                    .child(positionData.pollUid).addValueEventListener(object : ValueEventListener{
+//                        override fun onDataChange(snapshot: DataSnapshot) {
+//                            Log.d("TAG", "VOTES CHILD EXIST")
+//                            println("VOTES CHILD EXIST")
+//                            if(snapshot.hasChild("Votes")){
+//                                positionPollCard.visibility = View.GONE
+//                            }
+//                            else{
+//                                positionPollCard.visibility = View.VISIBLE
+//                            }
+//                        }
+//                        override fun onCancelled(error: DatabaseError) {
+//                        }
+//                    })
             }
 
             modelnames.candidates -> {
@@ -154,16 +165,12 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
 
             modelnames.fragpollpos -> {
                 val positionData = list[position] as PositionData
-                val createPollPosition =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_position)
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.create_poll_position)
                 val createPollClass = holder.itemview.findViewById<TextView>(R.id.create_poll_class)
-                val createPollSection =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_section)
+                val createPollSection = holder.itemview.findViewById<TextView>(R.id.create_poll_section)
                 val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.view_more)
-                val positionPollCard =
-                    holder.itemview.findViewById<MaterialCardView>(R.id.position_poll_card)
-                createPollClass.text =
-                    "Class: ${positionData.courseName} ${positionData.courseYear}"
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.position_poll_card)
+                createPollClass.text = "Class: ${positionData.courseName} ${positionData.courseYear}"
                 createPollPosition.text = "Position: ${positionData.position}"
                 createPollSection.text = "Section: ${positionData.section}"
 
@@ -184,8 +191,7 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
                         override fun onDataChange(snapshot: DataSnapshot) {
                             if (snapshot.exists()) {
                                 val current_time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Calendar.getInstance().time).toString()
-                                currentUserCourseYear =
-                                    snapshot.child("courseyear").value.toString()
+                                currentUserCourseYear = snapshot.child("courseyear").value.toString()
                                 currentuserSection = snapshot.child("section").value.toString()
                                 var flag = 0
                                 if (!currentuserSection.trim().equals(positionData.section.trim())) {
@@ -214,20 +220,13 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
 
             modelnames.castvotes -> {
                 val castVote = list[position] as CastVote
-                val cast_vote_card_view =
-                    holder.itemView.findViewById<MaterialCardView>(R.id.votingMainCard)
-                val cast_vote_profile_img =
-                    holder.itemView.findViewById<CircularImageView>(R.id.voting_lay_profile_pic)
-                val cast_vote_nameCand =
-                    holder.itemView.findViewById<TextView>(R.id.voting_lay_name_of_cand)
-                val cast_vote_classCand =
-                    holder.itemView.findViewById<TextView>(R.id.voting_lay_class)
-                val cast_vote_sectionCand =
-                    holder.itemView.findViewById<TextView>(R.id.voting_lay_section)
-                val cast_vote_positionCand =
-                    holder.itemView.findViewById<TextView>(R.id.voting_lay_position_of_cand)
-                val cast_vote_btnCand =
-                    holder.itemView.findViewById<MaterialButton>(R.id.voting_lay_cast_vote_button)
+                val cast_vote_card_view = holder.itemView.findViewById<MaterialCardView>(R.id.votingMainCard)
+                val cast_vote_profile_img = holder.itemView.findViewById<CircularImageView>(R.id.voting_lay_profile_pic)
+                val cast_vote_nameCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_name_of_cand)
+                val cast_vote_classCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_class)
+                val cast_vote_sectionCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_section)
+                val cast_vote_positionCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_position_of_cand)
+                val cast_vote_btnCand = holder.itemView.findViewById<MaterialButton>(R.id.voting_lay_cast_vote_button)
                 Glide.with(context).load(castVote.profimg).placeholder(R.drawable.unisex_avatar)
                     .dontAnimate().fitCenter()
                     .into(cast_vote_profile_img)
@@ -249,24 +248,17 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
 
             modelnames.viewResults -> {
                 val resData = list[position] as PositionData
-                val createPollPosition =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_position)
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.create_poll_position)
                 val createPollClass = holder.itemview.findViewById<TextView>(R.id.create_poll_class)
-                val createPollSection =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_section)
+                val createPollSection = holder.itemview.findViewById<TextView>(R.id.create_poll_section)
                 val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.view_more)
-                val positionPollCard =
-                    holder.itemview.findViewById<MaterialCardView>(R.id.position_poll_card)
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.position_poll_card)
                 createPollClass.text = "Class: ${resData.courseName} ${resData.courseYear}"
                 createPollPosition.text = "Position: ${resData.position}"
                 createPollSection.text = "Section: ${resData.section}"
 
                 viewMore.setOnClickListener {
-                    context.startActivity(
-                        Intent(
-                            context,
-                            TeacherDisplayResultActivity::class.java
-                        ).apply {
+                    context.startActivity(Intent(context, TeacherDisplayResultActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             putExtra("pollUid", resData.pollUid)
                             putExtra("collegeUid", resData.collegeUid)
@@ -291,8 +283,7 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
 
             modelnames.studViewResults -> {
                 val winnerData = list[position] as Winner
-                val createPollPosition =
-                    holder.itemview.findViewById<TextView>(R.id.create_poll_position)
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.create_poll_position)
                 val createPollClass = holder.itemview.findViewById<TextView>(R.id.create_poll_class)
                 val createPollSection = holder.itemview.findViewById<TextView>(R.id.create_poll_section)
                 val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.view_more)
@@ -301,53 +292,173 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
                 createPollPosition.text = "Position: ${winnerData.position}"
                 createPollSection.text = "Section: ${winnerData.section}"
 
-
-//                fBase.child("Votify").child("Users").child(currentUser)
-//                    .addValueEventListener(object : ValueEventListener {
-//                        override fun onDataChange(snapshot: DataSnapshot) {
-//                            if (snapshot.exists()) {
-//                                val current_time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Calendar.getInstance().time).toString()
-//                                currentUserCourseYear =
-//                                    snapshot.child("courseyear").value.toString()
-//                                currentuserSection = snapshot.child("section").value.toString()
-//                                var flag = 0
-//                                if (!currentuserSection.trim().equals(winnerData.section.trim())) {
-//                                    positionPollCard.visibility = View.GONE
-//                                    flag = 1
-//                                }
-//                                if (!currentUserCourseYear.trim().equals(winnerData.courseYear.trim())) {
-//                                    positionPollCard.visibility = View.GONE
-//                                    flag = 1
-//                                }
-//                            }
-//                        }
-//
-//                        override fun onCancelled(error: DatabaseError) {
-//                        }
-//                    })
-
                 viewMore.setOnClickListener {
                     context.startActivity(Intent(context, WinnersActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         putExtra("positionDataUid", winnerData.posDataUID)
                     })
                 }
-
             }
 
             modelnames.winners -> {
 //                val winner = list[position] as Winner
                 val user = list[position] as User
-                val winnerProfileImg =
-                    holder.itemView.findViewById<CircularImageView>(R.id.winner_student_image)
+                val winnerProfileImg = holder.itemView.findViewById<CircularImageView>(R.id.winner_student_image)
                 val winnerName = holder.itemView.findViewById<TextView>(R.id.winner_student_name)
-                Glide.with(context).load(user.profileimageurl).placeholder(R.drawable.unisex_avatar)
+                Glide.with(context).load(user.profileimageurl).placeholder(R.drawable.unisex_avatar).dontAnimate().fitCenter().into(winnerProfileImg)
+                winnerName.text = user.name
+            }
+
+            //COLLEGE COUNCIL
+            modelnames.ClgCouncilPollPos ->{
+                val ccPositionData = list[position] as CCPositionData
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.cc_create_poll_position)
+                val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.cc_view_more)
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.cc_position_poll_card)
+                createPollPosition.text = "Position: ${ccPositionData.position}"
+
+                viewMore.setOnClickListener {
+                    context.startActivity(Intent(context, ClgCouncilCreatePollInsideActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        putExtra("cc_candidate_uid_ref", ccPositionData.candidateUidRef)
+                        putExtra("cc_position", ccPositionData.position)
+                        putExtra("cc_courseName", ccPositionData.courseName)
+                    })
+                }
+            }
+
+            modelnames.clgCouncilCandidates ->{
+                val userData = list[position] as ClgCouncilCandidates
+                val userProfImg = holder.itemView.findViewById<CircularImageView>(R.id.user_image)
+                val userName = holder.itemView.findViewById<TextView>(R.id.username)
+                val userClass = holder.itemView.findViewById<TextView>(R.id.student_class)
+                val userSection = holder.itemView.findViewById<TextView>(R.id.student_section)
+                Glide.with(context).load(userData.profile_url).placeholder(R.drawable.unisex_avatar)
                     .dontAnimate()
-                    .fitCenter().into(winnerProfileImg)
+                    .fitCenter().into(userProfImg)
+                userName.text = userData.name
+                userClass.text = "Class: ${userData.course_name} ${userData.course_year}"
+                userSection.text = "Section: ${userData.section}"
+            }
+
+            modelnames.clgcouncilfragpollpos -> {
+                val ccPositionData = list[position] as CCPositionData
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.cc_create_poll_position)
+                val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.cc_view_more)
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.cc_position_poll_card)
+                createPollPosition.text = "Position: ${ccPositionData.position}"
+
+                viewMore.setOnClickListener {
+                    context.startActivity(Intent(context, CollegeCouncilStudentVotingActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        putExtra("clgc_candidate_uid_ref", ccPositionData.candidateUidRef)
+                        putExtra("clgc_position", ccPositionData.position)
+                        putExtra("clgc_pollUid", ccPositionData.pollUid)
+                        putExtra("clgc_collegeUid", ccPositionData.collegeUid)
+                        putExtra("clgc_courseName", ccPositionData.courseName)
+                    })
+                }
+                fBase.child("Votify").child("Users").child(currentUser)
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                val current_time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Calendar.getInstance().time).toString()
+                                currentUserCourseYear = snapshot.child("courseyear").value.toString()
+                                currentuserSection = snapshot.child("section").value.toString()
+                                if (current_time >= ccPositionData.starttime) {
+                                    positionPollCard.visibility = View.VISIBLE
+                                }
+                                if (current_time >= ccPositionData.endtime) {
+                                    positionPollCard.visibility = View.GONE
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                        }
+                    })
+            }
+
+            modelnames.clgcouncilcastvotes -> {
+                val castVote = list[position] as CastVote
+                val cast_vote_card_view = holder.itemView.findViewById<MaterialCardView>(R.id.votingMainCard)
+                val cast_vote_profile_img = holder.itemView.findViewById<CircularImageView>(R.id.voting_lay_profile_pic)
+                val cast_vote_nameCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_name_of_cand)
+                val cast_vote_classCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_class)
+                val cast_vote_sectionCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_section)
+                val cast_vote_positionCand = holder.itemView.findViewById<TextView>(R.id.voting_lay_position_of_cand)
+                val cast_vote_btnCand = holder.itemView.findViewById<MaterialButton>(R.id.voting_lay_cast_vote_button)
+                Glide.with(context).load(castVote.profimg).placeholder(R.drawable.unisex_avatar)
+                    .dontAnimate().fitCenter()
+                    .into(cast_vote_profile_img)
+                cast_vote_nameCand.text = castVote.name
+                cast_vote_classCand.text = "Class: ${castVote.class_name} ${castVote.class_year}"
+                cast_vote_sectionCand.text = "Section: ${castVote.section}"
+                cast_vote_positionCand.text = "Position: ${castVote.position}"
+
+                cast_vote_btnCand.isEnabled = !(castVote.isSelected)
+
+                cast_vote_btnCand.setOnClickListener {
+                    clickedPosition = holder.adapterPosition
+                    clgCouncilAddVote(castVote)
+                    castVote.isSelected = true
+                    disableAll()
+                    notifyDataSetChanged()
+                }
+            }
+
+            modelnames.clgcouncilviewresults -> {
+                val resData = list[position] as CCPositionData
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.cc_create_poll_position)
+                val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.cc_view_more)
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.cc_position_poll_card)
+                createPollPosition.text = "Position: ${resData.position}"
+
+                viewMore.setOnClickListener {
+                    context.startActivity(Intent(context, ClgCouncilDisplayResultActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            putExtra("ccPollUid", resData.pollUid)
+                            putExtra("ccCollegeUid", resData.collegeUid)
+                        })
+                }
+            }
+
+            modelnames.clgcouncilstudviewresult -> {
+                val winnerData = list[position] as ClgCouncilWinner
+                val createPollPosition = holder.itemview.findViewById<TextView>(R.id.cc_create_poll_position)
+                val viewMore = holder.itemview.findViewById<MaterialButton>(R.id.cc_view_more)
+                val positionPollCard = holder.itemview.findViewById<MaterialCardView>(R.id.cc_position_poll_card)
+                createPollPosition.text = "Position: ${winnerData.position}"
+                viewMore.setOnClickListener {
+                    context.startActivity(Intent(context, ClgCouncilWinnersActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        putExtra("positionDataUid", winnerData.posDataUID)
+                    })
+                }
+            }
+
+            modelnames.clgcouncilwinners -> {
+                val user = list[position] as User
+                val winnerProfileImg = holder.itemView.findViewById<CircularImageView>(R.id.winner_student_image)
+                val winnerName = holder.itemView.findViewById<TextView>(R.id.winner_student_name)
+                Glide.with(context).load(user.profileimageurl).placeholder(R.drawable.unisex_avatar).dontAnimate().fitCenter().into(winnerProfileImg)
                 winnerName.text = user.name
             }
 
         }
+    }
+
+    private fun clgCouncilAddVote(participant: CastVote) {
+        val reference = FirebaseDatabase.getInstance().reference
+        reference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
+            .child("Polls").child(pollUid).child("Votes").child(FirebaseAuth.getInstance().currentUser!!.uid.toString())
+            .setValue(participant.participantUid).addOnSuccessListener {
+                Toast.makeText(context, "Voted!!", Toast.LENGTH_SHORT).show()
+                context.startActivity(Intent(context, StudentHomeActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+                
+            }
     }
 
     private fun addVote(participant: CastVote) {
@@ -360,9 +471,7 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
                 context.startActivity(Intent(context, StudentHomeActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 })
-
             }
-
     }
 
     fun disableAll() {
@@ -376,5 +485,4 @@ class cardsAdapter(var type: String, var cardType: Int) : RecyclerView.Adapter<c
 }
 
 class cardViewHolder(var itemview: View) : RecyclerView.ViewHolder(itemview) {
-
 }

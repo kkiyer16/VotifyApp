@@ -12,4 +12,12 @@
     <color name="transparent">#00000000</color>
     <color name="delete_red">#FF3C30</color>
 
+    <color name="card1_color">#FFE194</color>
+    <color name="card2_color">#FFC288</color>
+    <color name="card3_color">#A7C5EB</color>
+    <color name="card4_color">#95E1D3</color>
+
+    <color name="disabled_color">#8C8C8C</color>
+
+
 </resources>

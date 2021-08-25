@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.project.votify.adapter.CollegeCouncilStudentAdapter
 import com.project.votify.adapter.SelectedCandidateAdapter
-import com.project.votify.adapter.StudentAdapter
 import com.project.votify.databinding.ActivityCollegeCouncilAddCandidateBinding
 import com.project.votify.databinding.AddCandidateDialogBinding
 import com.project.votify.models.ChangeValue
@@ -29,7 +29,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityCollegeCouncilAddCandidateBinding
     lateinit var studentList: ArrayList<User>
-    lateinit var adapter: StudentAdapter
+    lateinit var adapter: CollegeCouncilStudentAdapter
     lateinit var selectedCandidateAdapter: SelectedCandidateAdapter
     lateinit var reference: DatabaseReference
     var addItem: MenuItem? = null
@@ -55,7 +55,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
         sectionList = ArrayList()
         classList = ArrayList()
         selectedCandidateAdapter = SelectedCandidateAdapter(studentList, applicationContext)
-        adapter = StudentAdapter(studentList, applicationContext, object : ChangeValue {
+        adapter = CollegeCouncilStudentAdapter(studentList, applicationContext, object : ChangeValue {
             override fun onChange(isvisible: Boolean) {
                 if (addItem != null) {
                     addItem!!.isVisible = isvisible
@@ -66,20 +66,8 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
             }
 
         })
-        binding.sectionFilter.setAdapter(
-            ArrayAdapter(
-                this,
-                R.layout.simple_spinner_dropdown_item,
-                sectionList
-            )
-        )
-        binding.classFilter.setAdapter(
-            ArrayAdapter(
-                this,
-                R.layout.simple_spinner_dropdown_item,
-                classList
-            )
-        )
+        binding.sectionFilter.setAdapter(ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, sectionList))
+        binding.classFilter.setAdapter(ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, classList))
         binding.candidateRecycler.layoutManager = LinearLayoutManager(applicationContext)
         binding.candidateRecycler.adapter = adapter
         reference = FirebaseDatabase.getInstance().reference
@@ -103,7 +91,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
                                                 override fun onDataChange(sn: DataSnapshot) {
                                                     sn.children.forEach { winUid->
                                                         println("WinnersUID: ${winUid.key.toString()}")
-                                                        loadStudentData(winUid.key.toString())
+                                                        loadStudentData(winUid.key.toString(), course)
                                                     }
                                                 }
                                                 override fun onCancelled(error: DatabaseError) {
@@ -204,6 +192,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
             candidateHashMap["name"] = user.name
             candidateHashMap["uid"] = user.uid
             candidateHashMap["course_year"] = user.courseYear
+            candidateHashMap["course_name"] = user.courseName
             candidateHashMap["section"] = user.section
             candidateHashMap["profile_url"] = user.profileimageurl.toString()
             candidateData[UUID.randomUUID().toString()] = candidateHashMap
@@ -214,8 +203,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
         val simpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         data["created_on"] = simpleDateFormat.format(Date())
         data["created_by"] = FirebaseAuth.getInstance().currentUser!!.uid
-        data["courseyear"] = tempUser!!.courseYear
-        data["section"] = tempUser!!.section
+        data["council"] = "college"
         data["coursename"] = tempUser!!.courseName
         if (teacherCollegeUid != "") {
             val dataUid = UUID.randomUUID().toString()
@@ -233,7 +221,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadStudentData(winnersUid: String) {
+    private fun loadStudentData(winnersUid: String, course: String) {
         reference.child("Votify").child("Users").orderByChild("uid").equalTo(winnersUid)
             .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -242,8 +230,9 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
                         for (childSnapshot: DataSnapshot in snapshot.children) {
                             if (childSnapshot.key != FirebaseAuth.getInstance().currentUser!!.uid) {
                                 val uid = childSnapshot.child("uid").value.toString()
+                                val course_name = childSnapshot.child("coursename").value.toString()
                                 val isTeacher = childSnapshot.child("isTeacher").value.toString()
-                                if (uid == winnersUid && isTeacher == "0") {
+                                if (uid == winnersUid && course_name == course && isTeacher == "0") {
                                     val user = User(
                                         childSnapshot.key.toString(),
                                         childSnapshot.child("name").value.toString(),

@@ -25,6 +25,7 @@ class SplashActivity : AppCompatActivity() {
                 dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val userType = snapshot.child("isTeacher").value.toString()
+                        val clgUid = snapshot.child("collegeuid").value.toString()
                         if (userType == "1") {
                             startActivity(Intent(applicationContext, TeacherHomeMainActivity::class.java))
                             finish()

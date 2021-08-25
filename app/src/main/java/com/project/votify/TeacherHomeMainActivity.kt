@@ -10,12 +10,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.project.votify.databinding.ActivityTeacherHomeMainBinding
 
 class TeacherHomeMainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityTeacherHomeMainBinding
+    private val fBase = FirebaseDatabase.getInstance().reference
+    private val currentUser = FirebaseAuth.getInstance().currentUser!!.uid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +37,32 @@ class TeacherHomeMainActivity : AppCompatActivity() {
             toolbar.overflowIcon!!.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
         }
 
+        fBase.child("Votify").child("Users").child(currentUser).addValueEventListener(object :
+            ValueEventListener {
+            override fun onDataChange(ds: DataSnapshot) {
+                if(ds.exists()){
+                    val name_of_user = ds.child("name").value.toString().trim()
+                    binding.userName.text = "Hi, $name_of_user."
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(applicationContext, error.message.toString().trim(), Toast.LENGTH_SHORT).show()
+            }
+        })
+
         binding.collegeCouncil.setOnClickListener {
             startActivity(Intent(applicationContext, CollegeCouncilHomeActivity::class.java))
         }
         binding.classCouncil.setOnClickListener {
             startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
         }
+        binding.addPost.setOnClickListener {
+            startActivity(Intent(applicationContext, TeacherAddPostActivity::class.java))
+        }
+        binding.profile.setOnClickListener {
+            startActivity(Intent(applicationContext, TeacherProfileActivity::class.java))
+        }
+
     }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)

@@ -82,7 +82,7 @@ class StudentHomeActivity : AppCompatActivity() {
                     binding.fragmentContainer.currentItem = 1
                 }
                 R.id.drawer_results->{
-                    startActivity(Intent(applicationContext, StudentViewResultActivity::class.java))
+                    startActivity(Intent(applicationContext, ViewResultActivity::class.java))
                 }
                 R.id.drawer_add_post->{
                     startActivity(Intent(applicationContext, AddPostActivity::class.java))

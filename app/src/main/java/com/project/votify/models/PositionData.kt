@@ -7,3 +7,10 @@ data class PositionData(var position:String="",val courseName:String,var courseY
     var starttime=""
 
 }
+
+data class CCPositionData(var position:String="",val courseName:String, val candidateUidRef: String=""){
+    var pollUid=""
+    var collegeUid=""
+    var endtime=""
+    var starttime=""
+}

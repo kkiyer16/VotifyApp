@@ -3,29 +3,30 @@ package com.project.votify.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.project.votify.databinding.ClgCouncilRemoveCandPositionRowBinding
 import com.project.votify.databinding.RemoveCandidatePositionRowBinding
 import com.project.votify.models.Position
+import com.project.votify.utils.PositionClgCouncilHolder
 import com.project.votify.utils.PositionHolder
 import java.util.*
 
-class RemoveCandidatePositionAdapter(var positionList: ArrayList<Position>, var context: Context) :
-    RecyclerView.Adapter<PositionHolder>() {
+class RemoveCandClgCouncilAdapter(var positionList: ArrayList<Position>, var context: Context) :
+    RecyclerView.Adapter<PositionClgCouncilHolder>() {
 
     private var originalList: ArrayList<Position> = positionList
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PositionHolder {
-        val binding = RemoveCandidatePositionRowBinding.inflate(LayoutInflater.from(context), parent, false)
-        return PositionHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PositionClgCouncilHolder {
+        val binding = ClgCouncilRemoveCandPositionRowBinding.inflate(LayoutInflater.from(context), parent, false)
+        return PositionClgCouncilHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: PositionHolder, position: Int) {
+    override fun onBindViewHolder(holder: PositionClgCouncilHolder, position: Int) {
         val positionData: Position = positionList[position]
         holder.binding.positionName.text = positionData.position.capitalize(Locale.getDefault())
-        holder.binding.studentClass.text = "Class: ${positionData.courseYear}"
-        holder.binding.studentSection.text = "Section: ${positionData.section}"
         holder.binding.createdOn.text = "Created On: ${positionData.createdOn}"
         holder.binding.remove.setOnClickListener {
             removePosition(positionData)
@@ -35,9 +36,9 @@ class RemoveCandidatePositionAdapter(var positionList: ArrayList<Position>, var 
     private fun removePosition(positionData: Position) {
         val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().reference
         databaseReference.child("Votify").child("Institution").child(positionData.collegeUid)
-            .child("CandidateData")
-            .child(positionData.postionUid).removeValue().addOnSuccessListener {
-
+            .child("CollegeCouncil").child("CandidateData").child(positionData.postionUid).removeValue()
+            .addOnSuccessListener {
+                Toast.makeText(context, "Removed Successfully", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -48,9 +49,7 @@ class RemoveCandidatePositionAdapter(var positionList: ArrayList<Position>, var 
         } else {
             val results = ArrayList<Position>()
             for (g: Position in originalList) {
-                if (g.position.toLowerCase(Locale.getDefault())
-                        .contains(queryString.toLowerCase(Locale.getDefault()))
-                ) {
+                if (g.position.toLowerCase(Locale.getDefault()).contains(queryString.toLowerCase(Locale.getDefault()))) {
                     results.add(g)
                 }
             }
@@ -66,6 +65,6 @@ class RemoveCandidatePositionAdapter(var positionList: ArrayList<Position>, var 
     fun update(positionList: ArrayList<Position>) {
         this.positionList = positionList
         notifyDataSetChanged()
-
     }
+
 }

@@ -28,5 +28,14 @@ class CollegeCouncilHomeActivity : AppCompatActivity() {
         binding.collegeCouncilAddCandidates.setOnClickListener {
             startActivity(Intent(applicationContext, CollegeCouncilAddCandidateActivity::class.java))
         }
+        binding.collegeCouncilRemoveCandidate.setOnClickListener {
+            startActivity(Intent(applicationContext, CollegeCouncilRemoveCandidateActivity::class.java))
+        }
+        binding.collegeCouncilCreatePolls.setOnClickListener {
+            startActivity(Intent(applicationContext, CollegeCouncilCreatePollsActivity::class.java))
+        }
+        binding.displayResults.setOnClickListener { 
+            startActivity(Intent(applicationContext, CollegeCouncilViewResultActivity::class.java))
+        }
     }
 }

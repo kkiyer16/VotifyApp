@@ -1,35 +1,35 @@
 package com.project.votify
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.project.votify.adapter.RemoveCandClgCouncilAdapter
 import com.project.votify.adapter.RemoveCandidatePositionAdapter
-import com.project.votify.databinding.ActivityRemoveCandidateBinding
+import com.project.votify.databinding.ActivityCollegeCouncilRemoveCandidateBinding
 import com.project.votify.models.Position
 
-class RemoveCandidateActivity : AppCompatActivity() {
+class CollegeCouncilRemoveCandidateActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityRemoveCandidateBinding
+    lateinit var binding: ActivityCollegeCouncilRemoveCandidateBinding
     lateinit var positionList: ArrayList<Position>
-    lateinit var adapter: RemoveCandidatePositionAdapter
+    lateinit var adapter: RemoveCandClgCouncilAdapter
     lateinit var reference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRemoveCandidateBinding.inflate(layoutInflater)
+        binding = ActivityCollegeCouncilRemoveCandidateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
         positionList = ArrayList()
-        adapter = RemoveCandidatePositionAdapter(positionList, applicationContext)
+        adapter = RemoveCandClgCouncilAdapter(positionList, applicationContext)
         binding.removePositionRecycler.layoutManager = LinearLayoutManager(applicationContext)
         binding.removePositionRecycler.adapter = adapter
         reference = FirebaseDatabase.getInstance().reference
-        val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().reference
         reference.child("Votify").child("Users").child(FirebaseAuth.getInstance().currentUser!!.uid)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -41,7 +41,6 @@ class RemoveCandidateActivity : AppCompatActivity() {
 
                 override fun onCancelled(error: DatabaseError) {
                 }
-
             })
         binding.searchPosition.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
@@ -65,8 +64,8 @@ class RemoveCandidateActivity : AppCompatActivity() {
     }
 
     private fun loadPositionData(collegeUid: String) {
-        reference.child("Votify").child("Institution").child(collegeUid).child("CandidateData")
-            .addValueEventListener(object : ValueEventListener {
+        reference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
+            .child("CandidateData").addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists() && snapshot.hasChildren()) {
                         positionList.clear()

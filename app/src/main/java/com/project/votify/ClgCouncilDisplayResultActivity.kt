@@ -1,9 +1,9 @@
 package com.project.votify
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.anychart.APIlib
 import com.anychart.AnyChart
 import com.anychart.chart.common.dataentry.DataEntry
@@ -12,20 +12,19 @@ import com.anychart.charts.Pie
 import com.anychart.core.ui.Title
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.project.votify.databinding.ActivityTeacherDisplayResultBinding
+import com.project.votify.databinding.ActivityClgCouncilDisplayResultBinding
+import com.project.votify.models.CCPositionData
 import com.project.votify.models.PositionData
 import com.project.votify.models.User
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import org.apache.commons.lang3.StringUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class TeacherDisplayResultActivity : AppCompatActivity() {
+class ClgCouncilDisplayResultActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityTeacherDisplayResultBinding
+    lateinit var binding: ActivityClgCouncilDisplayResultBinding
     lateinit var pollUid: String
     lateinit var collegeUid: String
     private lateinit var databaseReference: DatabaseReference
@@ -33,20 +32,20 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
     private lateinit var pie: Pie
     lateinit var candidateVotes: HashMap<String, Int>
     lateinit var candidateList: ArrayList<User>
-    lateinit var positionData: PositionData
+    lateinit var positionData: CCPositionData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTeacherDisplayResultBinding.inflate(layoutInflater)
+        binding = ActivityClgCouncilDisplayResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.toolbar.title = ""
         setSupportActionBar(binding.toolbar)
 
-        if (intent.hasExtra("pollUid")) {
-            pollUid = intent.extras?.getString("pollUid").toString()
+        if (intent.hasExtra("ccPollUid")) {
+            pollUid = intent.extras?.getString("ccPollUid").toString()
         }
-        if (intent.hasExtra("collegeUid")) {
-            collegeUid = intent.extras?.getString("collegeUid").toString()
+        if (intent.hasExtra("ccCollegeUid")) {
+            collegeUid = intent.extras?.getString("ccCollegeUid").toString()
         }
 
         databaseReference = FirebaseDatabase.getInstance().reference
@@ -57,24 +56,22 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
 
         loadVotingData()
 
-        binding.displayResultsButton.setOnClickListener {
+        binding.ccDisplayResultsButton.setOnClickListener {
             displayResult(positionData, candidateVotes, candidateList)
         }
     }
 
     private fun loadVotingData() {
-        databaseReference.child("Votify").child("Institution").child(collegeUid).child("Polls")
-            .child(pollUid).addValueEventListener(
+        databaseReference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
+            .child("Polls").child(pollUid).addValueEventListener(
                 object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists() && snapshot.hasChildren()) {
-                            binding.widgetLoadingIndicator.visibility = View.VISIBLE
-                            binding.dataStatus.visibility = View.GONE
-                            positionData = PositionData(
+                            binding.ccWidgetLoadingIndicator.visibility = View.VISIBLE
+                            binding.ccDataStatus.visibility = View.GONE
+                            positionData = CCPositionData(
                                 snapshot.child("position").value.toString(),
                                 snapshot.child("course_name").value.toString(),
-                                snapshot.child("course_year").value.toString(),
-                                snapshot.child("section").value.toString(),
                                 snapshot.child("candidate_data_uid").value.toString()
                             )
                             positionData.collegeUid = collegeUid
@@ -88,7 +85,7 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
                             }
                         }
                         else {
-                            binding.dataStatus.visibility = View.VISIBLE
+                            binding.ccDataStatus.visibility = View.VISIBLE
                         }
                     }
 
@@ -99,14 +96,14 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
             )
     }
 
-    private fun loadCandidateData(positionData: PositionData, votingList: HashMap<String, String>) {
-        databaseReference.child("Votify").child("Institution")
-            .child(collegeUid).child("CandidateData").child(positionData.candidateUidRef)
-            .child("participants").addListenerForSingleValueEvent(
+    private fun loadCandidateData(positionData: CCPositionData, votingList: HashMap<String, String>) {
+        databaseReference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
+            .child("CandidateData").child(positionData.candidateUidRef).child("participants")
+            .addListenerForSingleValueEvent(
                 object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists() && snapshot.hasChildren()) {
-                            binding.dataStatus.visibility = View.GONE
+                            binding.ccDataStatus.visibility = View.GONE
                             candidateList.clear()
                             for (childSnapshot: DataSnapshot in snapshot.children) {
                                 val user = User(
@@ -122,7 +119,7 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
                                 countVotes(positionData, votingList, candidateList)
                             }
                         } else {
-                            binding.dataStatus.visibility = View.VISIBLE
+                            binding.ccDataStatus.visibility = View.VISIBLE
                         }
                     }
 
@@ -133,8 +130,8 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
             )
     }
 
-    private fun countVotes(positionData: PositionData, votingList: HashMap<String, String>, candidateList: ArrayList<User>) {
-        APIlib.getInstance().setActiveAnyChartView(binding.votingResultsChart);
+    private fun countVotes(positionData: CCPositionData, votingList: HashMap<String, String>, candidateList: ArrayList<User>) {
+        APIlib.getInstance().setActiveAnyChartView(binding.ccVotingResultsChart);
         candidateList.forEach {
             candidateVotes[it.uid] = 0
         }
@@ -149,65 +146,57 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
         }
         pie.data(pieData)
         val title: Title = pie.title()
-        pie.title("Position ${StringUtils.capitalize(positionData.position)} Section ${positionData.section}")
+        pie.title("Position ${StringUtils.capitalize(positionData.position)}")
         pie.labels().position("outside")
-        binding.votingResultsChart.visibility = View.VISIBLE
-        binding.votingResultsChart.setChart(pie)
-        binding.widgetLoadingIndicator.visibility = View.GONE
-        binding.dataStatus.visibility = View.GONE
+        binding.ccVotingResultsChart.visibility = View.VISIBLE
+        binding.ccVotingResultsChart.setChart(pie)
+        binding.ccWidgetLoadingIndicator.visibility = View.GONE
+        binding.ccDataStatus.visibility = View.GONE
     }
 
-    private fun displayResult(positionData: PositionData, candidateVotes: HashMap<String, Int>, candidateList: ArrayList<User>) {
+    private fun displayResult(positionData: CCPositionData, candidateVotes: HashMap<String, Int>, candidateList: ArrayList<User>) {
         if (candidateVotes.isNotEmpty() && candidateList.isNotEmpty()) {
             val data = HashMap<String, Any>()
             data["position"] = positionData.position
-            data["section"] = positionData.section
             data["course_name"] = positionData.courseName
-            data["course_year"] = positionData.courseYear
+//            data["resdetails"] = "${positionData.courseName}${positionData.position}"
             data["created_on"] = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()).toString()
 
-            val winners = candidateVotes.toList().sortedByDescending { (_, value) -> value }.take(2).toMap()
-            databaseReference.child("Votify").child("Institution").child(collegeUid).child("PositionData")
-                .orderByChild("course_name").equalTo(data["course_name"].toString())
+            val winners = candidateVotes.toList().sortedByDescending { (_, value) -> value }.take(1).toMap()
+            databaseReference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
+                .child("PositionData").orderByChild("course_name").equalTo(data["course_name"].toString())
                 .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists() && snapshot.hasChildren()) {
-                                var flag = 0;
-                                for (childSnapshot: DataSnapshot in snapshot.children) {
-                                    val course_year = childSnapshot.child("course_year").value.toString()
-                                    val section = childSnapshot.child("section").value.toString()
-                                    if (course_year == data["course_year"] && section == data["section"]) {
-                                        if (childSnapshot.hasChild("representatives")) {
-                                            val oldData = HashMap<String, String>()
-                                            for (subSnapshot: DataSnapshot in childSnapshot.child("representatives").children) {
-                                                oldData[subSnapshot.key.toString()] = subSnapshot.value.toString()
-                                            }
-                                            addRepresentatives(data, oldData, winners, childSnapshot.key.toString(), childSnapshot.child("created_on").value.toString())
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists() && snapshot.hasChildren()) {
+                            var flag = 0;
+                            for (childSnapshot: DataSnapshot in snapshot.children) {
+                                val course_name = childSnapshot.child("course_name").value.toString()
+                                if (course_name == data["course_name"] ) {
+                                    if (childSnapshot.hasChild("representatives")) {
+                                        val oldData = HashMap<String, String>()
+                                        for (subSnapshot: DataSnapshot in childSnapshot.child("representatives").children) {
+                                            oldData[subSnapshot.key.toString()] = subSnapshot.value.toString()
                                         }
-                                        flag = 1
-                                        break
+                                        addRepresentatives(data, oldData, winners, childSnapshot.key.toString(), childSnapshot.child("created_on").value.toString())
                                     }
-                                }
-                                if (flag == 0) {
-                                    addRepresentatives(data, HashMap(), winners,)
+                                    flag = 1
+                                    break
                                 }
                             }
-                            else {
+                            if (flag == 0) {
                                 addRepresentatives(data, HashMap(), winners,)
                             }
                         }
-
-                        override fun onCancelled(error: DatabaseError) {
+                        else {
+                            addRepresentatives(data, HashMap(), winners,)
                         }
+                    }
 
-                    })
+                    override fun onCancelled(error: DatabaseError) {
+                    }
 
-            winners.forEach { winnerUid->
-                val pos = HashMap<String, Any>()
-                pos["isClassCouncilMember"] = 1
-                println("Winners: ${winnerUid.key}")
-                databaseReference.child("Votify").child("Users").child(winnerUid.key).updateChildren(pos)
-            }
+                }
+                )
 
         } else {
             Toast.makeText(applicationContext, "No data available", Toast.LENGTH_SHORT).show()
@@ -218,14 +207,14 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
         if (parentUid.isEmpty()) {
             val uuid = UUID.randomUUID().toString()
             data["representatives"] = winners
-            databaseReference.child("Votify").child("Institution").child(collegeUid)
+            databaseReference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
                 .child("PositionData").child(uuid).setValue(data).addOnCompleteListener {
                     Toast.makeText(applicationContext, "Winners are added", Toast.LENGTH_SHORT).show()
                 }
         }
         else {
             data["representatives"] = winners
-            databaseReference.child("Votify").child("Institution").child(collegeUid)
+            databaseReference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
                 .child("PositionData").child(parentUid).updateChildren(data).addOnCompleteListener {
                     if (oldData.isNotEmpty()) {
                         addOldData(oldData, parentUid, createdOn)
@@ -238,10 +227,11 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
         val data = HashMap<String, Any>()
         data["representatives"] = oldData
         data["created_on"] = createdOn
-        databaseReference.child("Votify").child("Institution").child(collegeUid).child("PositionData")
-            .child(parentUid).child("oldData").child(UUID.randomUUID().toString())
+        databaseReference.child("Votify").child("Institution").child(collegeUid).child("CollegeCouncil")
+            .child("PositionData").child(parentUid).child("oldData").child(UUID.randomUUID().toString())
             .setValue(data).addOnCompleteListener {
                 Toast.makeText(applicationContext, "Winners are added", Toast.LENGTH_SHORT).show()
             }
     }
+
 }

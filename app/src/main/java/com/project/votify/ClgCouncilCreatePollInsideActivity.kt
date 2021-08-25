@@ -13,16 +13,17 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.project.votify.adapter.cardsAdapter
-import com.project.votify.databinding.ActivityCreatePollInsideBinding
+import com.project.votify.databinding.ActivityClgCouncilCreatePollInsideBinding
 import com.project.votify.models.Candidates
+import com.project.votify.models.ClgCouncilCandidates
 import com.project.votify.models.modelnames
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 
-class CreatePollInsideActivity : AppCompatActivity() {
+class ClgCouncilCreatePollInsideActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityCreatePollInsideBinding
+    lateinit var binding : ActivityClgCouncilCreatePollInsideBinding
     private val fBase = FirebaseDatabase.getInstance().reference
     lateinit var cardsAdap: cardsAdapter
     lateinit var arrayList: ArrayList<Any>
@@ -30,40 +31,38 @@ class CreatePollInsideActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCreatePollInsideBinding.inflate(layoutInflater)
+        binding = ActivityClgCouncilCreatePollInsideBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val candidate_uid = intent.extras?.getString("candidate_uid_ref")
-        val cand_pos = intent.extras?.getString("position")
-        val cand_sec = intent.extras?.getString("section")
-        val cand_course_name = intent.extras?.getString("course_name")
-        val cand_course_year = intent.extras?.getString("course_year")
+        val candidate_uid = intent.extras?.getString("cc_candidate_uid_ref")
+        val cand_pos = intent.extras?.getString("cc_position")
+        val course_name = intent.extras?.getString("cc_courseName")
 
         arrayList = ArrayList()
         binding.createPollsInsideRecyclerView.setHasFixedSize(true)
         val linearLayoutManager = LinearLayoutManager(applicationContext)
         binding.createPollsInsideRecyclerView.layoutManager = linearLayoutManager
-        cardsAdap = cardsAdapter(modelnames.candidates, 3)
+        cardsAdap = cardsAdapter(modelnames.clgCouncilCandidates, 3)
         cardsAdap.set(arrayList, applicationContext)
         binding.createPollsInsideRecyclerView.adapter = cardsAdap
 
         fBase.child("Votify").child("Users").child(currentUser)
-            .addValueEventListener(object : ValueEventListener{
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val clg_uid = snapshot.child("collegeuid").value.toString()
-                    fBase.child("Votify").child("Institution").child(clg_uid).child("CandidateData")
-                        .child(candidate_uid!!)
-                        .child("participants")
+                    fBase.child("Votify").child("Institution").child(clg_uid).child("CollegeCouncil")
+                        .child("CandidateData").child(candidate_uid!!).child("participants")
                         .addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snap: DataSnapshot) {
                                 arrayList.clear()
                                 for(ds in snap.children){
-                                    val userData = Candidates(
+                                    val userData = ClgCouncilCandidates(
                                         ds.child("profile_url").value.toString(),
                                         ds.child("name").value.toString(),
                                         ds.child("course_year").value.toString(),
                                         ds.child("section").value.toString(),
-                                        ds.child("uid").value.toString()
+                                        ds.child("uid").value.toString(),
+                                        ds.child("course_name").value.toString()
                                     )
                                     arrayList.add(userData)
                                 }
@@ -117,25 +116,21 @@ class CreatePollInsideActivity : AppCompatActivity() {
                     pollData["created_by"] = currentUser
                     pollData["created_on"] = created_on.toString()
                     pollData["position"] = cand_pos.toString()
-                    pollData["section"] = cand_sec.toString()
-                    pollData["course_name"] = cand_course_name.toString()
-                    pollData["course_year"] = cand_course_year.toString()
                     pollData["candidate_data_uid"] = candidate_uid.toString()
                     pollData["poll_start_time"] = start_time
                     pollData["poll_end_time"] = end_time
+                    pollData["course_name"] = course_name.toString()
 
                     fBase.child("Votify").child("Users").child(currentUser)
                         .addValueEventListener(object : ValueEventListener{
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val clg_uid = snapshot.child("collegeuid").value.toString()
-                                fBase.child("Votify").child("Institution").child(clg_uid)
-                                    .child("Polls")
-                                    .child(UUID.randomUUID().toString())
-                                    .setValue(pollData)
+                                fBase.child("Votify").child("Institution").child(clg_uid).child("CollegeCouncil")
+                                    .child("Polls").child(UUID.randomUUID().toString()).setValue(pollData)
                                     .addOnCompleteListener{
                                         if (it.isSuccessful){
                                             Toast.makeText(applicationContext, "Poll Created Successfully", Toast.LENGTH_SHORT).show()
-                                            startActivity(Intent(applicationContext, TeacherHomeMainActivity::class.java))
+                                            startActivity(Intent(applicationContext, TeacherHomeActivity::class.java))
                                             finish()
                                         }
                                         else{
