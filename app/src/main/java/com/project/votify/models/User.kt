@@ -5,5 +5,6 @@ data class User(var uid: String="", var name: String="", var collegeUid: String=
                 var mobileNumber: String="", var courseYear: String="", var email: String="", var isTeacher: Int=-1,
                 var profileimageurl: String="") {
     var isSelected = false
+    var positionHolding = ""
 
 }

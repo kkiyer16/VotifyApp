@@ -15,6 +15,7 @@ import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.mikhaellopez.circularimageview.CircularImageView
 import com.project.votify.adapter.PageAdapter
 import com.project.votify.adapter.ZoomOutPageTransformer
@@ -66,6 +67,15 @@ class StudentHomeActivity : AppCompatActivity() {
             }
         })
         setUpPager()
+
+        setToken()
+    }
+
+    private fun setToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task->
+            val token = task.result
+            println("UserToken: ${token.toString()}")
+        }
     }
 
     fun setDrawer(toolbar: Toolbar?) {

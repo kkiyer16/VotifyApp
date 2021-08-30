@@ -38,6 +38,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
     private var teacherCollegeUid: String = ""
     lateinit var sectionList: ArrayList<String>
     lateinit var classList: ArrayList<String>
+    lateinit var positionList: ArrayList<String>
     lateinit var list: ArrayList<String>
     lateinit var winnersArrList : ArrayList<String>
 
@@ -54,6 +55,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
         studentList = ArrayList()
         sectionList = ArrayList()
         classList = ArrayList()
+        positionList = ArrayList()
         selectedCandidateAdapter = SelectedCandidateAdapter(studentList, applicationContext)
         adapter = CollegeCouncilStudentAdapter(studentList, applicationContext, object : ChangeValue {
             override fun onChange(isvisible: Boolean) {
@@ -66,7 +68,8 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
             }
 
         })
-        binding.sectionFilter.setAdapter(ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, sectionList))
+//        binding.sectionFilter.setAdapter(ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, sectionList))
+        binding.sectionFilter.setAdapter(ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, positionList))
         binding.classFilter.setAdapter(ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, classList))
         binding.candidateRecycler.layoutManager = LinearLayoutManager(applicationContext)
         binding.candidateRecycler.adapter = adapter
@@ -86,16 +89,28 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
                                         println("PositionDataUid: ${dataSnapshot.key.toString()}")
                                         val positionDataUid = dataSnapshot.key.toString()
                                         reference.child("Votify").child("Institution").child(collegeUid)
-                                            .child("PositionData").child(positionDataUid).child("representatives")
-                                            .addValueEventListener(object : ValueEventListener{
-                                                override fun onDataChange(sn: DataSnapshot) {
-                                                    sn.children.forEach { winUid->
-                                                        println("WinnersUID: ${winUid.key.toString()}")
-                                                        loadStudentData(winUid.key.toString(), course)
+                                            .child("PositionData").child(positionDataUid).addValueEventListener(object: ValueEventListener{
+                                                override fun onDataChange(snapShot: DataSnapshot) {
+                                                    if(snapShot.exists()){
+                                                        val positionName = snapShot.child("position").value.toString()
+                                                        reference.child("Votify").child("Institution").child(collegeUid)
+                                                            .child("PositionData").child(positionDataUid).child("representatives")
+                                                            .addValueEventListener(object : ValueEventListener{
+                                                                override fun onDataChange(sn: DataSnapshot) {
+                                                                    sn.children.forEach { winUid->
+                                                                        println("WinnersUID: ${winUid.key.toString()}")
+                                                                        loadStudentData(winUid.key.toString(), course, positionName)
+                                                                    }
+                                                                }
+                                                                override fun onCancelled(error: DatabaseError) {
+                                                                }
+                                                            })
                                                     }
                                                 }
+
                                                 override fun onCancelled(error: DatabaseError) {
                                                 }
+
                                             })
                                     }
                                 }
@@ -128,7 +143,8 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
             }
         })
         binding.sectionFilter.setOnItemClickListener { _, _, position, _ ->
-            adapter.filterBySection(sectionList[position])
+//            adapter.filterBySection(sectionList[position])
+            adapter.filterByPosition(positionList[position])
         }
         binding.classFilter.setOnItemClickListener { _, _, position, _ ->
             adapter.filterByClass(classList[position])
@@ -221,7 +237,7 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadStudentData(winnersUid: String, course: String) {
+    private fun loadStudentData(winnersUid: String, course: String, positionName: String) {
         reference.child("Votify").child("Users").orderByChild("uid").equalTo(winnersUid)
             .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -232,6 +248,8 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
                                 val uid = childSnapshot.child("uid").value.toString()
                                 val course_name = childSnapshot.child("coursename").value.toString()
                                 val isTeacher = childSnapshot.child("isTeacher").value.toString()
+                                val positionHolding = childSnapshot.child("positionHolding").value.toString()
+                                println("positionHolding $positionHolding")
                                 if (uid == winnersUid && course_name == course && isTeacher == "0") {
                                     val user = User(
                                         childSnapshot.key.toString(),
@@ -251,6 +269,9 @@ class CollegeCouncilAddCandidateActivity : AppCompatActivity() {
                                     }
                                     if (!sectionList.contains(user.section)) {
                                         sectionList.add(user.section)
+                                    }
+                                    if (!positionList.contains(positionHolding)){
+                                        positionList.add(positionHolding)
                                     }
 
                                     studentList.add(user)

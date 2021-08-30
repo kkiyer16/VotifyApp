@@ -224,7 +224,7 @@
                 android:id="@+id/teacher_id_ep_page"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Teacher ID"
+                android:hint="Teacher/Student ID"
                 android:inputType="number"
                 android:textColor="@color/black" />
 

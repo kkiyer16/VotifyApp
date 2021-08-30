@@ -205,6 +205,7 @@ class TeacherDisplayResultActivity : AppCompatActivity() {
             winners.forEach { winnerUid->
                 val pos = HashMap<String, Any>()
                 pos["isClassCouncilMember"] = 1
+                pos["positionHolding"] = data["position"].toString()
                 println("Winners: ${winnerUid.key}")
                 databaseReference.child("Votify").child("Users").child(winnerUid.key).updateChildren(pos)
             }

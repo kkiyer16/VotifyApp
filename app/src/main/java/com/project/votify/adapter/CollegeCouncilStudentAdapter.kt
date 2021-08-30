@@ -128,4 +128,16 @@ class CollegeCouncilStudentAdapter(var studentList: ArrayList<User>, var context
         studentList.addAll(0, results)
         notifyDataSetChanged()
     }
+
+    fun filterByPosition(positonGroup: String){
+        val results = ArrayList<User>()
+        studentList.forEach { user->
+            if(user.positionHolding == positonGroup){
+                results.add(user)
+            }
+        }
+        studentList.removeAll(results)
+        studentList.addAll(0, results)
+        notifyDataSetChanged()
+    }
 }
