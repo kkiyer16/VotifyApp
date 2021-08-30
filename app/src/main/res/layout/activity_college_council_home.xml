@@ -43,7 +43,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/college_council_add_candidates"
         android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_height="125dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -76,7 +76,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/college_council_remove_candidate"
         android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_height="125dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -109,7 +109,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/college_council_create_polls"
         android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_height="125dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -142,7 +142,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/display_results"
         android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_height="125dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
